@@ -1,4 +1,4 @@
 2048
 ====
 
-A C++/Qt clone of the popular 2048 game
+A C++/Qt clone of the popular 2048 game. 
