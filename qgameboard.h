@@ -7,7 +7,7 @@
 #include <QWidget>
 
 class QResetButton;
-class Board;
+class Game;
 class QKeyEvent;
 class QTile;
 class QGridLayout;
@@ -21,14 +21,15 @@ public:
     void notify();
 
 private:
-    Board* board;
+
+    Game* game;
     // gui representation of board
     QVector<QVector<QTile*> > gui_board;
     // grid layout of board
     QGridLayout *boardLayout;
     QResetButton* reset;
 
-    void draw();
+    void drawBoard();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

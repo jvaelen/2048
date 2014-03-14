@@ -11,6 +11,8 @@ using namespace std;
 
 Board::Board(int dimension)
 {
+    pointsScoredLastRound = 0;
+    tileCollisionLastRound = false;
     this->dimension = dimension;
     init();
 }
@@ -65,23 +67,23 @@ QVector<int> Board::freePosition()
     return pos;
 }
 
-bool Board::changed(Board& other)
+bool Board::changed(Board& other) const
 {
     if (dimension != other.dimension)
         return false;
     for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; ++j)
             if ( ( board[i][j] == NULL && other.board[i][j] != NULL ||
-                 board[i][j] != NULL && other.board[i][j] == NULL ) ||
+                   board[i][j] != NULL && other.board[i][j] == NULL ) ||
                  ( board[i][j] != NULL && other.board[i][j] != NULL &&
-                 board[i][j]->getValue() != other.board[i][j]->getValue()) )
+                   board[i][j]->getValue() != other.board[i][j]->getValue()) )
                 return true;
     return false;
 }
 
 void Board::reset()
 {
-   for (int i = 0; i < dimension ; ++i)
+    for (int i = 0; i < dimension ; ++i)
         for (int j = 0; j < dimension; ++j)
             board[i][j] = NULL;
 
@@ -89,6 +91,7 @@ void Board::reset()
     board[start[0]][start[1]] = new Tile();
     start = freePosition();
     board[start[0]][start[1]] = new Tile();
+
 }
 
 Tile* Board::getTile(int i, int j)
@@ -99,48 +102,69 @@ Tile* Board::getTile(int i, int j)
 void Board::move(Direction direction)
 {
     Board pre_move_board(*this);
-    bool tileCollision = false;
+
+    // reset tileCollision & pointsScoredLastTile
+    tileCollisionLastRound = false;
+    pointsScoredLastRound = 0;
 
     switch (direction) {
     case UP:
         for (int i = 0; i < dimension; ++i)
             for (int j = 0; j < dimension; ++j)
-                if (moveVertically(i,j,UP))
-                    tileCollision = true;
+                moveVertically(i,j,UP);
         break;
     case DOWN:
         for (int i = dimension-1; i >= 0; --i)
             for (int j = 0; j < dimension; ++j)
-                if (moveVertically(i,j,DOWN))
-                    tileCollision = true;
+                moveVertically(i,j,DOWN);
         break;
     case LEFT:
         for (int i = 0; i < dimension; ++i)
             for (int j = 0; j < dimension; ++j)
-                if (moveHorizontally(i,j,LEFT))
-                    tileCollision = true;
+                moveHorizontally(i,j,LEFT);
         break;
     case RIGHT:
         for (int i = 0; i < dimension; ++i)
             for (int j = dimension-1; j >= 0; --j)
-                if (moveHorizontally(i,j, RIGHT))
-                    tileCollision = true;
+                moveHorizontally(i,j, RIGHT);
     }
 
-   // if the board has changed and there was no tile collision, place a new tile
-    if (changed(pre_move_board) && !tileCollision) {
+    // if the board has changed and there was no tile collision, place a new tile
+    if (changed(pre_move_board) && !tileCollisionLastRound) {
         QVector<int> newpos = freePosition();
         board[newpos[0]][newpos[1]] = new Tile();
     }
 
+
     notifyObservers();
 }
 
-bool Board::moveHorizontally(int i, int j, Direction dir) {
+bool Board::movePossible() const
+{
+    if (full()) {
+        // check if there is still a move to do
+        Board newBoard(*this);
+        newBoard.move(UP);
+        if (changed(newBoard)) return true;
+        newBoard.move(DOWN);
+        if (changed(newBoard)) return true;
+        newBoard.move(LEFT);
+        if (changed(newBoard)) return true;
+        newBoard.move(RIGHT);
+        if (changed(newBoard)) return true;
 
-    bool tileCollision = false;
+        // no possible move
+        return false;
+    }
+    else {
+        return true;
+    }
+}
 
+void Board::moveHorizontally(int i, int j, Direction dir)
+{
     if (board[i][j] != NULL) {
+        bool tileCollision = false;
         int newj;
         if (dir == RIGHT)
             newj = j + 1;
@@ -169,6 +193,7 @@ bool Board::moveHorizontally(int i, int j, Direction dir) {
             if (board[i][newj]->getValue() == board[i][j]->getValue()) {
                 board[i][newj]->upgrade();
                 tileCollision = true;
+                pointsScoredLastRound = board[i][newj]->getValue();
             }
             // collision with tile of other value, put this tile next to it
             else {
@@ -183,16 +208,15 @@ bool Board::moveHorizontally(int i, int j, Direction dir) {
         if ( (dir == RIGHT && newj-1 != j) || (dir == LEFT && newj+1 != j) || tileCollision )
             board[i][j] = NULL;
 
+        if (tileCollision)
+            tileCollisionLastRound = true;
     }
-
-    return tileCollision;
 }
 
-bool Board::moveVertically(int i, int j, Direction dir) {
-
-    bool tileCollision = false;
-
+void Board::moveVertically(int i, int j, Direction dir)
+{
     if (board[i][j] != NULL) {
+        bool tileCollision = false;
         int newi;
         if (dir == UP)
             newi = i - 1;
@@ -200,7 +224,7 @@ bool Board::moveVertically(int i, int j, Direction dir) {
         else
             newi = i + 1;
 
-       // keep going in dir direction until we encounter something or get out of bounds
+        // keep going in dir direction until we encounter something or get out of bounds
         while (inbounds(newi,j) && board[newi][j] == NULL) {
             if (dir == UP)
                 newi--;
@@ -232,15 +256,16 @@ bool Board::moveVertically(int i, int j, Direction dir) {
         }
         // remove the original tile if we made multiple moves
         // or if we did not make multiple moves but we merged with the tile we were standing next to
-            if ( (dir == UP && newi+1 != i) || (dir == DOWN && newi-1 != i) || tileCollision )
-                    board[i][j] = NULL;
+        if ( (dir == UP && newi+1 != i) || (dir == DOWN && newi-1 != i) || tileCollision )
+            board[i][j] = NULL;
 
+        if (tileCollision)
+            tileCollisionLastRound = true;
     }
 
-    return tileCollision;
 }
 
-bool Board::full()
+bool Board::full() const
 {
     bool full = true;
     for (int i = 0; i < dimension; ++i)

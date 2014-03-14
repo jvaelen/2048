@@ -23,6 +23,11 @@ public:
     Tile* getTile(int i, int j);
     int getDimension() const { return dimension; }
     void move(Direction direction);
+    bool full() const;
+    int getPointsScoredLastRound() const { return pointsScoredLastRound; }
+    bool isTileCollisionLastRound() const { return tileCollisionLastRound; }
+    // is there still a move possible
+    bool movePossible() const;
 
 private:
     QVector<QVector<Tile*> > board;
@@ -33,13 +38,15 @@ private:
     // generate a random, free position on the board
     QVector<int> freePosition();
     // returns true if the current state of the board is different from the argument
-    bool changed(Board& other);
+    bool changed(Board& other) const;
 
-    // true if the board is filled with tiles
-    bool full();
     bool inbounds(int i, int j);
-    bool moveHorizontally(int i, int j, Direction dir);
-    bool moveVertically(int i, int j, Direction dir);
+    // changes state!! (tileCollision & pointsScoredLastRound)
+    void moveHorizontally(int i, int j, Direction dir);
+    void moveVertically(int i, int j, Direction dir);
+
+    int pointsScoredLastRound;
+    bool tileCollisionLastRound;
 };
 
 #endif // BOARD_H
