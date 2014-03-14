@@ -13,26 +13,26 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    tile.cpp \
-    board.cpp \
-    game.cpp \
-    player.cpp \
-    qgameboard.cpp \
-    qtile.cpp \
-    qresetbutton.cpp \
-    observer.cpp \
-    subject.cpp
+        gui/mainwindow.cpp \
+    core/tile.cpp \
+    core/board.cpp \
+    core/game.cpp \
+    core/player.cpp \
+    gui/qgameboard.cpp \
+    gui/qtile.cpp \
+    gui/qresetbutton.cpp \
+    core/observer.cpp \
+    core/subject.cpp
 
 HEADERS  += mainwindow.h \
-    tile.h \
-    board.h \
-    game.h \
-    player.h \
-    qgameboard.h \
-    qtile.h \
-    qresetbutton.h \
-    observer.h \
-    subject.h
+    core/tile.h \
+    core/board.h \
+    core/game.h \
+    core/player.h \
+    gui/qgameboard.h \
+    gui/qtile.h \
+    gui/qresetbutton.h \
+    core/observer.h \
+    core/subject.h
 
 FORMS    += mainwindow.ui
