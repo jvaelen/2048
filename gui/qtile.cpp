@@ -1,5 +1,5 @@
-#include "qtile.h"
-#include "tile.h"
+#include "gui/qtile.h"
+#include "core/tile.h"
 
 #include <QGraphicsDropShadowEffect>
 

@@ -1,8 +1,9 @@
-#include "game.h"
-#include "tile.h"
+#include "core/game.h"
+#include "core/tile.h"
 
 Game::Game(int dimension)
 {
+    score = 0;
     board = new Board(dimension);
     restart();
 }

@@ -1,5 +1,5 @@
-#include "board.h"
-#include "tile.h"
+#include "core/board.h"
+#include "core/tile.h"
 
 #include <iostream>
 #include <stdlib.h>     /* srand, rand */
@@ -73,9 +73,9 @@ bool Board::changed(Board& other) const
         return false;
     for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; ++j)
-            if ( ( board[i][j] == NULL && other.board[i][j] != NULL ||
-                   board[i][j] != NULL && other.board[i][j] == NULL ) ||
-                 ( board[i][j] != NULL && other.board[i][j] != NULL &&
+            if ( ( (board[i][j] == NULL && other.board[i][j] != NULL) ||
+                   (board[i][j] != NULL && other.board[i][j] == NULL) ) ||
+                 ( (board[i][j] != NULL && other.board[i][j] != NULL) &&
                    board[i][j]->getValue() != other.board[i][j]->getValue()) )
                 return true;
     return false;
@@ -83,9 +83,15 @@ bool Board::changed(Board& other) const
 
 void Board::reset()
 {
-    for (int i = 0; i < dimension ; ++i)
-        for (int j = 0; j < dimension; ++j)
+    pointsScoredLastRound = 0;
+    tileCollisionLastRound = false;
+
+    for (int i = 0; i < dimension ; ++i) {
+        for (int j = 0; j < dimension; ++j) {
+            delete board[i][j];
             board[i][j] = NULL;
+        }
+    }
 
     QVector<int> start = freePosition();
     board[start[0]][start[1]] = new Tile();
@@ -129,12 +135,11 @@ void Board::move(Direction direction)
                 moveHorizontally(i,j, RIGHT);
     }
 
-    // if the board has changed and there was no tile collision, place a new tile
-    if (changed(pre_move_board) && !tileCollisionLastRound) {
+    // if the board has changed (and there was no tile collision), place a new tile
+    if (changed(pre_move_board) /*&& !tileCollisionLastRound*/) {
         QVector<int> newpos = freePosition();
         board[newpos[0]][newpos[1]] = new Tile();
     }
-
 
     notifyObservers();
 }
@@ -193,7 +198,7 @@ void Board::moveHorizontally(int i, int j, Direction dir)
             if (board[i][newj]->getValue() == board[i][j]->getValue()) {
                 board[i][newj]->upgrade();
                 tileCollision = true;
-                pointsScoredLastRound = board[i][newj]->getValue();
+                pointsScoredLastRound += board[i][newj]->getValue();
             }
             // collision with tile of other value, put this tile next to it
             else {
@@ -245,6 +250,7 @@ void Board::moveVertically(int i, int j, Direction dir)
             if (board[newi][j]->getValue() == board[i][j]->getValue()) {
                 board[newi][j]->upgrade();
                 tileCollision = true;
+                pointsScoredLastRound += board[newi][j]->getValue();
             }
             // collision with tile of other value, put this tile next to it
             else {

@@ -17,22 +17,21 @@ SOURCES += main.cpp\
     core/tile.cpp \
     core/board.cpp \
     core/game.cpp \
-    core/player.cpp \
     gui/qgameboard.cpp \
     gui/qtile.cpp \
     gui/qresetbutton.cpp \
     core/observer.cpp \
-    core/subject.cpp
+    core/subject.cpp \
+    gui/qgameoverwindow.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += gui/mainwindow.h \
     core/tile.h \
     core/board.h \
     core/game.h \
-    core/player.h \
     gui/qgameboard.h \
     gui/qtile.h \
     gui/qresetbutton.h \
     core/observer.h \
-    core/subject.h
+    core/subject.h \
+    gui/qgameoverwindow.h
 
-FORMS    += mainwindow.ui

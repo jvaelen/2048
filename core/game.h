@@ -3,8 +3,8 @@
 
 #define WINNING_VALUE 2048
 
-#include "subject.h"
-#include "board.h"
+#include "core/subject.h"
+#include "core/board.h"
 
 class Board;
 
@@ -19,6 +19,7 @@ public:
     // returns true if the game is in the win state,
     // (i.e. there is a tile that has the value as defined in WINNING_VALUE)
     bool won() const;
+    int getScore() const { return score; }
 
 private:
     Board* board;

@@ -1,5 +1,5 @@
-#include "subject.h"
-#include "observer.h"
+#include "core/subject.h"
+#include "core/observer.h"
 
 Subject::Subject()
 {

@@ -1,4 +1,4 @@
-#include "observer.h"
+#include "core/observer.h"
 
 Observer::Observer()
 {
