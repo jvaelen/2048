@@ -44,7 +44,6 @@ QGameBoard::QGameBoard(QWidget *parent) :
     // create the score widget and add it to the board
     score = new QLabel(QString("SCORE: %1").arg(game->getScore()));
     score->setStyleSheet("QLabel { color: rgb(235,224,214); font: 16pt; }");
-//    score->setFixedWidth(200);
     score->setFixedHeight(50);
     mainLayout->insertWidget(1, score, 0, Qt::AlignRight);
 
@@ -77,12 +76,10 @@ void QGameBoard::notify()
     if (game->isGameOver())
         gameOverWindow.show();
 
-    if (game->won()) {
-        // todo
-    }
-
-    // update score
-    score->setText(QString("SCORE: %1").arg(game->getScore()));
+    if (game->won())
+        score->setText(QString("You hit 2048, congratulations! Keep playing to increase your score.\t\t SCORE: %1").arg(game->getScore()));
+    else
+        score->setText(QString("SCORE: %1").arg(game->getScore()));
 
     drawBoard();
 }
