@@ -141,7 +141,19 @@ void Board::move(Direction direction)
         board[newpos[0]][newpos[1]] = new Tile();
     }
 
+    prepareForNextMove();
+
     notifyObservers();
+}
+
+void Board::prepareForNextMove() {
+    for (int i = 0; i < dimension; ++i) {
+        for (int j = 0; j < dimension; ++j) {
+            if (board[i][j] != nullptr) {
+                board[i][j]->setUpgratedThisMove(false);
+            }
+        }
+    }
 }
 
 bool Board::movePossible() const
@@ -195,8 +207,11 @@ void Board::moveHorizontally(int i, int j, Direction dir)
         // ... collision
         else {
             // collision with tile of same value
-            if (board[i][newj]->getValue() == board[i][j]->getValue()) {
+            if (board[i][newj]->getValue() == board[i][j]->getValue() &&
+                !board[i][newj]->getUpgratedThisMove()) {
+
                 board[i][newj]->upgrade();
+                board[i][newj]->setUpgratedThisMove(true);
                 tileCollision = true;
                 pointsScoredLastRound += board[i][newj]->getValue();
             }
@@ -247,8 +262,11 @@ void Board::moveVertically(int i, int j, Direction dir)
         // ... collision
         else {
             // collision with tile of same value
-            if (board[newi][j]->getValue() == board[i][j]->getValue()) {
+            if (board[newi][j]->getValue() == board[i][j]->getValue() &&
+                !board[newi][j]->getUpgratedThisMove()) {
+
                 board[newi][j]->upgrade();
+                board[newi][j]->setUpgratedThisMove(true);
                 tileCollision = true;
                 pointsScoredLastRound += board[newi][j]->getValue();
             }

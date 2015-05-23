@@ -45,6 +45,9 @@ private:
     void moveHorizontally(int i, int j, Direction dir);
     void moveVertically(int i, int j, Direction dir);
 
+    // some reinitalisation for the next round
+    void prepareForNextMove();
+
     int pointsScoredLastRound;
     bool tileCollisionLastRound;
 };
