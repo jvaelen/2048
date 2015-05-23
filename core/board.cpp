@@ -109,9 +109,7 @@ void Board::move(Direction direction)
 {
     Board pre_move_board(*this);
 
-    // reset tileCollision & pointsScoredLastTile
-    tileCollisionLastRound = false;
-    pointsScoredLastRound = 0;
+    prepareForNextMove();
 
     switch (direction) {
     case UP:
@@ -141,12 +139,13 @@ void Board::move(Direction direction)
         board[newpos[0]][newpos[1]] = new Tile();
     }
 
-    prepareForNextMove();
-
     notifyObservers();
 }
 
-void Board::prepareForNextMove() {
+void Board::prepareForNextMove()
+{
+    tileCollisionLastRound = false;
+    pointsScoredLastRound = 0;
     for (int i = 0; i < dimension; ++i) {
         for (int j = 0; j < dimension; ++j) {
             if (board[i][j] != nullptr) {
@@ -210,10 +209,8 @@ void Board::moveHorizontally(int i, int j, Direction dir)
             if (board[i][newj]->getValue() == board[i][j]->getValue() &&
                 !board[i][newj]->getUpgratedThisMove()) {
 
-                board[i][newj]->upgrade();
-                board[i][newj]->setUpgratedThisMove(true);
                 tileCollision = true;
-                pointsScoredLastRound += board[i][newj]->getValue();
+                handleCollision(i, newj);
             }
             // collision with tile of other value, put this tile next to it
             else {
@@ -264,11 +261,8 @@ void Board::moveVertically(int i, int j, Direction dir)
             // collision with tile of same value
             if (board[newi][j]->getValue() == board[i][j]->getValue() &&
                 !board[newi][j]->getUpgratedThisMove()) {
-
-                board[newi][j]->upgrade();
-                board[newi][j]->setUpgratedThisMove(true);
                 tileCollision = true;
-                pointsScoredLastRound += board[newi][j]->getValue();
+                handleCollision(newi, j);
             }
             // collision with tile of other value, put this tile next to it
             else {
@@ -287,6 +281,13 @@ void Board::moveVertically(int i, int j, Direction dir)
             tileCollisionLastRound = true;
     }
 
+}
+
+void Board::handleCollision(int i, int j)
+{
+    board[i][j]->upgrade();
+    board[i][j]->setUpgratedThisMove(true);
+    pointsScoredLastRound += board[i][j]->getValue();
 }
 
 bool Board::full() const

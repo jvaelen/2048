@@ -44,6 +44,7 @@ private:
     // changes state!! (tileCollision & pointsScoredLastRound)
     void moveHorizontally(int i, int j, Direction dir);
     void moveVertically(int i, int j, Direction dir);
+    void handleCollision(int i, int j);
 
     // some reinitalisation for the next round
     void prepareForNextMove();
