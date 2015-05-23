@@ -8,6 +8,11 @@ Game::Game(int dimension)
     restart();
 }
 
+Game::~Game()
+{
+    delete board;
+}
+
 void Game::move(Direction dir)
 {
     // do the move

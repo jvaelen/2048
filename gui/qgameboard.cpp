@@ -15,6 +15,11 @@
 
 #include <QDebug>
 
+QGameBoard::~QGameBoard()
+{
+    delete game;
+}
+
 QGameBoard::QGameBoard(QWidget *parent) :
     QWidget(parent)
 {

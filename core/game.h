@@ -12,6 +12,7 @@ class Game : public Subject
 {
 public:
     Game(int dimension);
+    ~Game();
     void restart();
     bool isGameOver() const { return gameOver; }
     Board* getGameBoard() const { return board; }
