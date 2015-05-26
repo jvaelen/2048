@@ -17,3 +17,5 @@ Build instructions
 2. Open Qt Creator, File > Open File or Project... > Locate `ExpGame.pro` and select it
 3. Build project
 4. Run
+
+Alternatively, if you want to build outside of Qt Creator, this is possible as long as your system has both `qmake` and `make`. In that case, just run `qmake && make` in the checked out repository.
